@@ -1,10 +1,10 @@
-% *****************************************************************************
-% *                                                                           *
-% *		          Trajectory visualiser - OSQP	                              *
-% *				Luke Rickard with thankst to Aren Karapetyan    		      *
-% *	     Plots the simulated trajectories of three agents in 3D               *
-% *                                                                           *
-% *****************************************************************************
+% **********************************************
+% *                                                                     *
+% *		          Trajectory visualiser - OSQP                       *
+% *				Luke Rickard with thanks to Aren Karapetyan         *
+% *	     Plots the simulated trajectories of three agents in 3D    *
+% *                                                                     *
+% **********************************************
 
 function visualise_drones_3d (r,x,T,nx,delta)
 
