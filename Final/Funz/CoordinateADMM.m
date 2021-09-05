@@ -90,6 +90,7 @@ classdef CoordinateADMM < matlab.System & matlab.system.mixin.Propagates
             opts = optimoptions('quadprog','Display','off','Algorithm','Active-set');
             resc = quadprog(full(Pc),qc,-A_ineq,-l_ineq,[],[],[],[],init,opts);
 %             resc = qp_grad(full(Pc),qc,-A_ineq,-l_ineq,[],[],[],[],init,1e-2);
+
             
             ADMM_update.w = resc(1:obj.Nd*(obj.N+1),1);
             for j = 1:nnz(constraints.N_j)
