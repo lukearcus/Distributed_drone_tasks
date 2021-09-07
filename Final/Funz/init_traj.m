@@ -31,8 +31,7 @@ Ax = kron(speye(N+1), -speye(nx)) + kron(sparse(diag(ones(N, 1), -1)), A);
 Bu = kron([sparse(1, N); speye(N)], B);
 Aeq = [Ax, Bu];
 b_eq = [-x0'; zeros(N*nx, 1)];
-P_new = blkdiag( kron(eye(N), Q+ (size(N_j,2)+1)*rho/2*posM ), Q+(size(N_j,2)+1)*rho/2*posM, kron(eye(N), R) );
-
+P_new = blkdiag(kron(eye(N+1),Q),kron(eye(N),R));
 q = [repmat(-Q*r', N, 1); -Q*r'; zeros(N*nu, 1)];
 
 init = [repmat(x0',N+1,1);zeros(nu*N,1)];
