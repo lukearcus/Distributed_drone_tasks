@@ -1,5 +1,5 @@
 classdef CoordinateADMM < matlab.System & matlab.system.mixin.Propagates
-    % CoordinateADMM Updates the ADMM vector during the predict cycle
+    % CoordinateADMM Updates the ADMM vector during the coordinate cycle
     %
     % This template includes the minimum set of functions required
     % to define a System object with discrete state.
@@ -10,7 +10,6 @@ classdef CoordinateADMM < matlab.System & matlab.system.mixin.Propagates
     
     properties(Nontunable)
         N (1,1) double = 30;                                   % time horizon (samples)
-        delta (1,1) double = 0.5;                                % distance constraint
         M (1,1) double = 4; % Number of agents
         
         SampleTime = 0.1; % Sample Time
