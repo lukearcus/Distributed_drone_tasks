@@ -31,6 +31,7 @@ classdef predictADMM < matlab.System & matlab.system.mixin.Propagates
         B
         Q
         R
+        QN
         min_input
         max_input
         u_bound
@@ -78,7 +79,8 @@ classdef predictADMM < matlab.System & matlab.system.mixin.Propagates
             
             obj.Q = blkdiag(eye(obj.Nd)*obj.PosQ,eye(obj.nx-obj.Nd)*obj.velQ);
             obj.R = eye(obj.nu)*obj.RVal;
-            
+            [~,Qterm] = dlqr(obj.A,obj.B,obj.Q,obj.R,[]);
+            obj.QN = Qterm;
             obj.min_input = repmat(ones(obj.nu,1)*obj.max_acc*-1,obj.N,1);
             obj.max_input = repmat(ones(obj.nu,1)*obj.max_acc,obj.N,1);
             
@@ -105,14 +107,14 @@ classdef predictADMM < matlab.System & matlab.system.mixin.Propagates
             obj.b_eq = [-constraints.x0 zeros(1, obj.N*obj.nx)]';
             
             P_new = blkdiag( kron(eye(obj.N), obj.Q+ (nnz(constraints.N_j)+1)*ADMM_input.rho/2*obj.posM ), ...
-                obj.Q+(nnz(constraints.N_j)+1)*ADMM_input.rho/2*obj.posM, kron(eye(obj.N), obj.R) );
+                obj.QN+(nnz(constraints.N_j)+1)*ADMM_input.rho/2*obj.posM, kron(eye(obj.N), obj.R) );
             
             q = prediction_linear(ADMM_input.lambda, ...
                 ADMM_input.lambda_from_j, ...
                 ADMM_input.w, ...
                 ADMM_input.w_from_j, ...
                 ADMM_input.rho, ...
-                constraints.r', obj.Q, obj.N, obj.nu, obj.posMN,nonzeros(constraints.N_j));
+                constraints.r', obj.Q, obj.N, obj.nu, obj.posMN,nonzeros(constraints.N_j),obj.QN);
             
             init = [ADMM_input.x; ADMM_input.u];
             opts = optimoptions('quadprog','Display','off','Algorithm','Active-set');
