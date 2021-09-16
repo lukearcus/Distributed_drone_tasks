@@ -12,7 +12,10 @@ classdef predictADMM < matlab.System & matlab.system.mixin.Propagates
         N (1,1) double = 30;                                   % time horizon (samples)
         delta (1,1) double = 0.5;                                % distance constraint
         M (1,1) double = 4; % Number of agents
-        
+        PosQ (1,1) double = 10; %Position penalty weighting
+        velQ (1,1) double = 0; %Velocity penalty weighting
+        RVal (1,1) double = 13; %Acceleration penalty weighting
+        max_acc (1,1) double = 1; %maximum acceleration
         SampleTime = 0.1; % Sample Time
         SampleTimeTypeProp (1, 1) {mustBeMember(SampleTimeTypeProp, ...
             ["Discrete","FixedInMinorStep","Controllable",...
@@ -45,8 +48,6 @@ classdef predictADMM < matlab.System & matlab.system.mixin.Propagates
         Nd = 3; % number of dimensions
         nx
         nu
-        umax = 1;
-        umin = -1;
         admmxlength
         admmulength
     end
@@ -75,11 +76,11 @@ classdef predictADMM < matlab.System & matlab.system.mixin.Propagates
             obj.admmxlength = obj.nx*(obj.N+1);
             obj.admmulength = obj.nu*(obj.N);
             
-            obj.Q = blkdiag(eye(obj.Nd)*10,zeros(obj.nx-obj.Nd));
-            obj.R = eye(obj.nu)*13;
+            obj.Q = blkdiag(eye(obj.Nd)*obj.PosQ,eye(obj.nx-obj.Nd)*obj.velQ);
+            obj.R = eye(obj.nu)*obj.RVal;
             
-            obj.min_input = repmat(ones(obj.nu,1)*obj.umin,obj.N,1);
-            obj.max_input = repmat(ones(obj.nu,1)*obj.umax,obj.N,1);
+            obj.min_input = repmat(ones(obj.nu,1)*obj.max_acc*-1,obj.N,1);
+            obj.max_input = repmat(ones(obj.nu,1)*obj.max_acc,obj.N,1);
             
             obj.u_bound = [inf((obj.N+1)*obj.nx,1);obj.max_input];
             obj.l_bound = [-inf((obj.N+1)*obj.nx,1);obj.min_input];
