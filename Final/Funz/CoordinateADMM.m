@@ -43,9 +43,6 @@ classdef CoordinateADMM < matlab.System & matlab.system.mixin.Propagates
 
             
             obj.nx = 6; %state vector dimension
-            obj.nu = 3; %number of inputs
-            
-            
      
             obj.posM = blkdiag(eye(obj.Nd),zeros(obj.nx-obj.Nd)); % Matrix to take only position from the state vector x (zeros rest)
             obj.d = [eye(obj.Nd),zeros(obj.Nd,obj.nx-obj.Nd)]; % Matrix to take only position from the state vector x (only returns pos)
@@ -57,18 +54,18 @@ classdef CoordinateADMM < matlab.System & matlab.system.mixin.Propagates
         function ADMM_update = stepImpl(obj, ADMM_input, constraints,i)
             ADMM_update = ADMM_input;
             H = kron(eye(obj.N+1),repmat(obj.d, nnz(constraints.N_j), 1));
-            Hw = kron(eye(obj.N+1),repmat(eye(obj.nu), nnz(constraints.N_j), 1));
+            Hw = kron(eye(obj.N+1),repmat(eye(obj.Nd), nnz(constraints.N_j), 1));
             for j = 1:nnz(constraints.N_j)
                 v = zeros(nnz(constraints.N_j),1);
                 v(j) = 1;
                 H_M = kron(eye(obj.N+1),kron(v, -1*obj.d));
-                H_Mw = kron(eye(obj.N+1),kron(v, -1*eye(obj.nu)));
+                H_Mw = kron(eye(obj.N+1),kron(v, -1*eye(obj.Nd)));
                 
                 H =  [H, H_M];
                 Hw = [Hw,H_Mw];
             end
           
-            rhoM = kron(speye((obj.N+1)),ADMM_update.rho/2*eye(obj.nu)); % matrix for the quadratic objective formualation
+            rhoM = kron(speye((obj.N+1)),ADMM_update.rho/2*eye(obj.Nd)); % matrix for the quadratic objective formualation
             Pc = kron(eye(1+nnz(constraints.N_j)),rhoM);
             
 
@@ -81,7 +78,7 @@ classdef CoordinateADMM < matlab.System & matlab.system.mixin.Propagates
             for j = 1:nnz(constraints.N_j)
                 init = [init;ADMM_update.w_to_j(:,actual_N_j(j))];
             end
-            [A_ineq,l_ineq] = communicate(ADMM_update.x_bar,obj.N,constraints.N_j,H,Hw,constraints.delta,obj.nu,i);
+            [A_ineq,l_ineq] = communicate(ADMM_update.x_bar,obj.N,constraints.N_j,H,Hw,constraints.delta,obj.Nd,i);
             
             if A_ineq*init < l_ineq
                 init = A_ineq\l_ineq;
