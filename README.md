@@ -4,8 +4,10 @@
 - MATLAB
   - Simulink
   - DSP System Toolbox
+  - Signal Processing Toolbox
   - Optimization Toolbox
   - UAV Toolbox
+  - Control System Toolbox
 
 ## Running
 
